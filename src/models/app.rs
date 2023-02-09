@@ -72,32 +72,30 @@ impl App {
         use graphics::*;
 
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-        const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
-        const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
-
-        let square = rectangle::square(0.0, 0.0, 50.0);
-        let rotation = self.player.rotation;
+        const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];        
+        
+        let player = &self.player;
         
         let x = self.player.x;
         let y = self.player.y;
         let cursor_pos = self.cursor_pos;
-        let velocity = self.player.velocity;
+        let rotation = self.player.rotation;
 
-        self.gl.draw(args.viewport(), |c, gl| {
-            // Clear the screen.
+        self.gl.draw(args.viewport(), |ctxt, gl| {
+            
             clear(BLACK, gl);
 
-            // Render velocity
-            // let mut glyphs = GlyphCache::new("assets/FiraSans-Regular.ttf", (), TextureSettings::new()).unwrap();
-            // let txt = format!("Velocity: {}", velocity as i64);
-            // let size = 30;
-            // let transform = c.transform.trans(300.0, 400.0);
-            // Text::new_color(color::WHITE, size)
-            //     .draw(txt.as_str(), &mut glyphs, &DrawState::default(), transform, gl);       
-            let transform = c.transform;
+            
+            let mut glyphs = GlyphCache::new("assets/FiraSans-Regular.ttf", (), TextureSettings::new()).unwrap();
+            let txt = format!("{}", rotation);
+            let size = 20;
+            let transform = ctxt.transform.trans(300.0, 400.0);
+            Text::new_color(color::WHITE, size)
+                .draw(txt.as_str(), &mut glyphs, &DrawState::default(), transform, gl);       
+            let transform = ctxt.transform;
             let l = Line{
                 color: WHITE,
-                radius: 0.2,
+                radius: 0.5,
                 shape: graphics::line::Shape::Square,
             };
             l.draw_from_to(
@@ -108,14 +106,8 @@ impl App {
                 gl
             );
 
-            let transform = c
-                .transform
-                .trans(x, y)
-                .rot_rad(rotation)
-                .trans(-25.0, -25.0);
-
-            // Draw a box rotating around the middle of the screen.
-            rectangle(RED, square, transform, gl);
+            player.render(ctxt, gl);
+            
         });
     }
 

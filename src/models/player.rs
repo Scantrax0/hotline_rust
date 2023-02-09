@@ -1,4 +1,5 @@
 use piston::input::{UpdateArgs};
+use opengl_graphics::{GlGraphics};
 
 pub struct Player {
     pub x: f64,
@@ -16,6 +17,29 @@ pub struct Player {
 }
 
 impl Player {
+
+    pub fn render(&self, ctxt: graphics::Context, gl: &mut GlGraphics) {
+        use graphics::*; 
+        let radius: f64 = 10.0;
+        let circle = rectangle::Rectangle::new_round(color::PURPLE, radius);
+        let transform = ctxt
+            .transform
+            .trans(self.x, self.y)
+            .rot_rad(self.rotation)
+            .trans(-radius, -radius);
+
+        circle.draw([0.0, 0.0, radius*2.0, radius*2.0], &ctxt.draw_state, transform, gl);
+        
+        let rectangle = rectangle::Rectangle::new(color::WHITE);
+        let transform = ctxt
+            .transform
+            .trans(self.x, self.y)
+            .rot_rad(self.rotation)
+            .trans(0.0, -radius/10.0);
+
+        rectangle.draw([0.0, 0.0, radius, radius/5.0], &ctxt.draw_state, transform, gl);
+    }
+
     pub fn update(&mut self, args: &UpdateArgs) {
         if !self.is_accelerating_x {
             self.stop_move_x();
