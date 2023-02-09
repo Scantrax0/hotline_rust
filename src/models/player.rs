@@ -1,5 +1,6 @@
 use piston::input::{UpdateArgs};
 use opengl_graphics::{GlGraphics};
+use crate::models::enemy::Enemy;
 
 pub struct Player {
     pub x: f64,
@@ -74,6 +75,14 @@ impl Player {
         }
         
         
+    }
+
+    pub fn is_collided(&self, enemy: &Enemy) -> bool {
+        let dist = ((self.x - enemy.x).powi(2) + (self.y - enemy.y).powi(2)).sqrt();
+        if dist <= 10.0 + enemy.size {          
+            return true;
+        }
+        return false;
     }
 
     pub fn calculate_velocity(&mut self) {

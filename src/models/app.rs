@@ -2,10 +2,12 @@ use piston::input::{Key, UpdateArgs, RenderArgs, Button};
 use opengl_graphics::{GlGraphics, OpenGL, GlyphCache, TextureSettings};
 
 use crate::models::player::Player;
+use crate::models::enemy::{Enemy, EnemyClass, EnemyState};
 
 pub struct App {
     gl: GlGraphics,
     player: Player,
+    enemy: Enemy,
     cursor_pos: [f64; 2],
 }
 
@@ -28,9 +30,18 @@ impl App {
             rotation: 0.0,
         };
 
+        let enemy = Enemy {
+            x: 200.0,
+            y: 300.0,
+            size: 50.0,
+            class: EnemyClass::Square,
+            state: EnemyState::Alive,
+        };
+
         App {
             gl,  
             player,
+            enemy,
             cursor_pos: [0.0, 0.0],
         }
 
@@ -72,6 +83,7 @@ impl App {
         const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];        
         
         let player = &self.player;
+        let enemy = &self.enemy;
         
         let x = self.player.x;
         let y = self.player.y;
@@ -82,13 +94,8 @@ impl App {
             
             clear(BLACK, gl);
 
-            
-            let mut glyphs = GlyphCache::new("assets/FiraSans-Regular.ttf", (), TextureSettings::new()).unwrap();
-            let txt = format!("{}", rotation);
-            let size = 20;
-            let transform = ctxt.transform.trans(300.0, 400.0);
-            Text::new_color(color::WHITE, size)
-                .draw(txt.as_str(), &mut glyphs, &DrawState::default(), transform, gl);       
+            // App::render_text("bruh", ctxt, gl);
+                   
             let transform = ctxt.transform;
             let l = Line{
                 color: WHITE,
@@ -104,11 +111,24 @@ impl App {
             );
 
             player.render(ctxt, gl);
+            enemy.render(ctxt, gl);
             
         });
     }
 
+    pub fn render_text(txt: &str, ctxt: graphics::Context, gl: &mut GlGraphics) {
+        use graphics::*;
+        let mut glyphs = GlyphCache::new("assets/FiraSans-Regular.ttf", (), TextureSettings::new()).unwrap();        
+        let size = 50;
+        let transform = ctxt.transform.trans(300.0, 400.0);
+        Text::new_color(color::WHITE, size)
+            .draw(txt, &mut glyphs, &DrawState::default(), transform, gl);
+    }
+
     pub fn update(&mut self, args: &UpdateArgs) {
         self.player.update(self.cursor_pos, args);
+        if self.player.is_collided(&self.enemy) {
+            self.enemy.state = EnemyState::Dead;
+        };
     }
 }
