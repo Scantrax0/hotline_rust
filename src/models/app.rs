@@ -36,12 +36,9 @@ impl App {
 
     }
 
-    pub fn cursor_move(&mut self, pos: [f64; 2]) {
-        let delta_x = pos[0] - self.player.x;
-        let delta_y = pos[1] - self.player.y;
-        let tan = delta_y / delta_x;
-        self.player.rotation = tan.atan();
+    pub fn cursor_move(&mut self, pos: [f64; 2]) {        
         self.cursor_pos = pos;
+        self.player.update_rotation(pos);
     }
 
     pub fn input(&mut self, button: &Button, is_press: bool) {
@@ -112,6 +109,6 @@ impl App {
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
-        self.player.update(args);
+        self.player.update(self.cursor_pos, args);
     }
 }

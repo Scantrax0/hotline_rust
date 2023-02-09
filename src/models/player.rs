@@ -40,7 +40,7 @@ impl Player {
         rectangle.draw([0.0, 0.0, radius, radius/5.0], &ctxt.draw_state, transform, gl);
     }
 
-    pub fn update(&mut self, args: &UpdateArgs) {
+    pub fn update(&mut self, cursor_pos: [f64; 2], args: &UpdateArgs) {
         if !self.is_accelerating_x {
             self.stop_move_x();
         }
@@ -59,6 +59,21 @@ impl Player {
 
         self.x += self.velocity_x * args.dt;
         self.y += self.velocity_y * args.dt;
+
+        self.update_rotation(cursor_pos);
+    }
+
+    pub fn update_rotation(&mut self, cursor_pos: [f64; 2]) {
+        let delta_x = cursor_pos[0] - self.x;
+        let delta_y = cursor_pos[1] - self.y;
+        let tan = delta_y / delta_x;
+        if delta_x >= 0.0 {
+            self.rotation = tan.atan();
+        } else {
+            self.rotation = tan.atan() + std::f64::consts::PI;
+        }
+        
+        
     }
 
     pub fn calculate_velocity(&mut self) {
